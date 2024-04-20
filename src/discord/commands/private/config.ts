@@ -8,6 +8,7 @@ new Command({
     dmPermission: false,
     type: ApplicationCommandType.ChatInput,
     async run(interaction){ 
+
         if(!interaction.member.permissions.has("Administrator")) {
             interaction.reply({ content: 'Infelizmente, Você nao tem permissão para usar esse comando.', ephemeral})
         } else {
@@ -25,7 +26,7 @@ new Command({
                    {label: 'Status', value: 'config/stats', emoji: '💫'},
                    {label: 'Palavra Bloqueada', value: 'config/messblock', emoji: '❌'},
                    {label: 'Banimento', value: 'config/banlist', emoji: '⚠'},
-                   {label: 'Canais', value: 'config/canais', emoji: '🔧'}
+                   {label: 'Canais e Cargos', value: 'config/canais', emoji: '🔧'}
                ],
            }),
        );

@@ -3,10 +3,9 @@ import { createRow } from "@magicyan/discord";
 import {
   ButtonBuilder,
   ButtonStyle,
-  ChannelSelectMenuBuilder,
-  ChannelType,
   ComponentType,
   EmbedBuilder,
+  StringSelectMenuBuilder,
 } from "discord.js";
 import { join } from "path";
 import { QuickDB } from "quick.db";
@@ -141,27 +140,34 @@ new Component({
     }
 
     if (opc1 === "config/canais") {
-      let channellogs = await db.config.get("config.channellog");
+      const channellogs = await db.config.get("config.channellog");
+      const ticketcategory = await db.config.get("config.ticketcategory");
+      const roleticket = await db.config.get("config.roleticket");
 
       const channel = selectinteraction.guild.channels.cache.get(channellogs);
+      const categoryticket = selectinteraction.guild.channels.cache.get(ticketcategory);
+      const roleguild = selectinteraction.guild.roles.cache.get(roleticket)
 
       let uichannel = new EmbedBuilder()
         .setAuthor({
           name: "Configuração - Canais",
           iconURL: selectinteraction.guild.iconURL({ extension: "png" }) ?? "",
         })
-        .addFields({
-          name: "Logs",
-          value: `${channel ?? "nenhum canal definido"}`,
-        });
+        .addFields(
+          { name: "Logs", value: `${channel ?? "nenhum canal definido"}`, inline },
+          { name: "Categoria Ticket", value: `${categoryticket ?? " categoria não definida"}`, inline},
+          { name: "Cargo do ticket", value: `${roleguild ?? " cargo não definida"}`, inline}
+        );
 
       const row = createRow(
-        new ChannelSelectMenuBuilder({
-          customId: "config/canais/selectmenu",
-          placeholder: "selecione o canal",
-          channelTypes: [ChannelType.GuildText],
-          maxValues: 1,
-          minValues: 1,
+        new StringSelectMenuBuilder({
+          customId: "config/canais/options",
+          placeholder: "selecione uma opção",
+          options: [
+            { label: "canal de logs", value: "config/canais/selectmenu"},
+            { label: "categoria do ticket", value: "config/canais/ticket-category"},
+            { label: "Cargo do ticket", value: "config/canais/role-ticket"}
+          ]
         })
       );
 

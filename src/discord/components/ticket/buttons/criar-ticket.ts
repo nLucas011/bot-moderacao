@@ -8,21 +8,21 @@ import {
 } from "discord.js";
 
 new Component({
-  customId: "stats/Competing",
+  customId: "create-ticket",
   type: ComponentType.Button,
   cache: "cached",
   async run(interaction) {
     const modal = new ModalBuilder({
-      custom_id: "stats/modaltext-competing",
+      custom_id: "ticket/modaltext-create-ticket",
       title: "Coloque o texto",
     });
 
     const input = new ActionRowBuilder<TextInputBuilder>({
       components: [
         new TextInputBuilder({
-          customId: "stats/modaltext/input",
-          label: "Status",
-          placeholder: "coloque o texto aqui",
+          customId: "ticket/modaltext/input",
+          label: "Ticket",
+          placeholder: "coloque o motivo do atendimento aqui",
           style: TextInputStyle.Short,
           required,
         }),
