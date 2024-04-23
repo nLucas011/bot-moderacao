@@ -4,20 +4,18 @@ import { ApplicationCommandType, ButtonBuilder, ButtonStyle } from "discord.js";
 
 new Command({
 	name: "ping",
-	description: "🏓 replies with pong",
+	description: "Replies with pong 🏓",
 	dmPermission: false,
 	type: ApplicationCommandType.ChatInput,
 	async run(interaction){
-
 		const row = createRow(
-			new ButtonBuilder({
+			// ../../components/buttons/remind.ts
+			new ButtonBuilder({ 
 				customId: `remind/${new Date().toISOString()}`,
 				label: "Ping",
 				style: ButtonStyle.Success
 			})
 		);
-
-		await interaction.reply({ ephemeral, embeds, content: "pong", components: [row] });
-
+		await interaction.reply({ fetchReply, ephemeral, content: "pong", components: [row] });
 	}
 });

@@ -5,6 +5,7 @@ import {
   EmbedBuilder,
 } from "discord.js";
 import ms from "ms";
+import prettyMs from "pretty-ms";
 
 new Command({
   name: "castigo",
@@ -16,6 +17,7 @@ new Command({
       name: "usuario",
       description: "insira o usuario aqui",
       type: ApplicationCommandOptionType.User,
+      required,
     },
     {
       name: "tempo",
@@ -24,19 +26,18 @@ new Command({
     },
   ],
   async run(interaction) {
-    let user = interaction.options.getUser("usuario");
-    let time: any = interaction.options.get("tempo")!.value;
-    let duration: any = ms(time);
-
-    let mention = interaction.guild.members.cache.get(user!.id);
-    if (!mention) {
-      return interaction.reply({
+    const user = interaction!.options.getUser("usuario");
+    const time: any = interaction.options.get("tempo")!.value;
+    const duration: any = ms(time);
+    const mention = interaction.guild.members.cache.get(user!.id);
+    if (mention) {
+      interaction.reply({
         content: `usuario: ${user!.id} não se encontra no servidor`,
         ephemeral,
       });
+      return;
     }
 
-    const { default: prettyMs } = await import("pretty-ms");
     const timeoutui = new EmbedBuilder()
       .setTitle("Usuario foi Mutado!")
       .setColor("Random").setDescription(`

@@ -6,42 +6,52 @@ import { log, onError } from "#settings";
 import glob from "fast-glob";
 import ck from "chalk";
 
-const foldername = basename(join(getDirname(import.meta), "../../"));
+const foldername = basename(join(import.meta.dirname, "../../"));
 
-export function createClient(options: Partial<ClientOptions> = {}) {
-	const { intents, partials, ...otherOptions } = options;
-
-	const client = new Client({
+interface GuildCommandsMethod {
+	type: "guild",
+	guilds: string[]
+}
+interface GlobalCommandsMethod {
+	type: "global",
+}
+type CommandsMethod = GuildCommandsMethod | GlobalCommandsMethod;
+interface CreateClientOptions extends Partial<ClientOptions> {
+	commandsMethod?: CommandsMethod
+}
+export function createClient(options: CreateClientOptions = {}) {
+	const { intents, partials, commandsMethod={ type: "global" }, ...otherOptions } = options;
+	const client = new Client(Object.assign({
 		intents: intents ?? CustomItents.All,
 		partials: partials ?? CustomPartials.All,
 		failIfNotExists: false, closeTimeout: 0,
-		...otherOptions
-	});
+	}, otherOptions));
 
 	client.start = async function(options) {
-		this.once("ready", async (readyClient) => {
-			process.on("uncaughtException", async (err) => onError(err, readyClient));
-			process.on("unhandledRejection", async (err) => onError(err, readyClient));
+		this.once("ready", async (client) => {
+			process.on("uncaughtException", async (err) => onError(err, client));
+			process.on("unhandledRejection", async (err) => onError(err, client));
 			console.log();
 			log.success(
 				`${ck.green("Bot online")} ${ck.blue.underline("discord.js")} 📦 ${ck.yellow(version)} \n`,
-				`${ck.greenBright(`➝ Connected as ${ck.underline(readyClient.user.username)}`)}`
+				`${ck.greenBright(`➝ Connected as ${ck.underline(client.user.username)}`)}`
 			);
 			console.log();
 
-			await readyClient.application.commands.set(Array.from(Command.commands.values()))
-			.then(() => log.success(ck.green("Commands registered successfully!")))
-			.catch(log.error);
+			if (commandsMethod.type === "guild"){
+				const guilds = client.guilds.cache.filter(
+					({ id }) => commandsMethod.guilds.includes(id)
+				);
+				await Command.registerGuildCommands(client, guilds);
+			} else {
+				await Command.registerGlobalCommands(client);
+			}
+			
 
-			if (options?.whenReady) options.whenReady(readyClient);
+			if (options?.whenReady) options.whenReady(client);
 		});
-		const paths = await glob(
-			[
-				`./${foldername}/discord/**/*.{ts,js}`,
-				`!./${foldername}/discord/base/*`
-			],
-			{ absolute: true }
-		);
+		const patterns = [`./${foldername}/discord/**/*.{ts,js}`, `!./${foldername}/discord/base/*`];
+		const paths = await glob(patterns, { absolute: true });
 
 		await Promise.all(paths.map(async path => import(`file://${path}`)));
 		Event.register(this); Listener.register(this);

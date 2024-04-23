@@ -1,0 +1,9 @@
+/.vscode
+/dist
+/node_modules
+/discloud
+
+/.eslintrc.json
+/.gitignore
+/package-lock.json
+/README.md

@@ -29,14 +29,16 @@ new Command({
       const language: any = interaction.options.getString("idioma");
 
       if (!language) {
-        return await interaction.reply({
+        await interaction.reply({
           content: "opa amigo, insira uma linguagem porfavor",
         });
+        return;
       } else if (language == false) {
-        return await interaction.reply({
+        await interaction.reply({
           content: `a linguagem **${language}** nao é suportada`,
           ephemeral: true,
         });
+        return;
       }
 
       let texttraduzido = await translate(text, { to: language });

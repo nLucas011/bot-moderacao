@@ -1,44 +1,25 @@
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 
 declare global {
-	var animated: true;
-	var fetchReply: true;
-	var ephemeral: true;
-	var required: true;
-	var inline: true;
-	var disabled: true;
-
-	var components: [];
-	var embeds: [];
-
-	var __rootname: string;
-	var rootTo: (...path: string[]) => string;
-	var getFilename: (meta: ImportMeta) => string;
-	var getDirname: (meta: ImportMeta) => string;
-
-	function importMeta(meta: ImportMeta): {
-		__filename: string;
-		__dirname: string;
-	};
+  const animated: true;
+  const fetchReply: true;
+  const ephemeral: true;
+  const required: true;
+  const inline: true;
+  const disabled: true;
+  const __rootname: string;
+  function rootTo(...path: string[]): string;
 }
 
-globalThis.animated = true;
-globalThis.fetchReply = true;
-globalThis.ephemeral = true;
-globalThis.required = true;
-globalThis.inline = true;
-globalThis.disabled = true;
-
-globalThis.components = [];
-globalThis.embeds = [];
-
-globalThis.__rootname = process.cwd();
-globalThis.getFilename = (meta) => fileURLToPath(meta.url);
-globalThis.getDirname = (meta) => dirname(getFilename(meta));
-globalThis.rootTo = (...path: string[]) => join(__rootname, ...path);
-
-globalThis.importMeta = (meta) => ({
-	__filename: getFilename(meta),
-	__dirname: getDirname(meta)
+Object.assign(globalThis, {
+  animated: true,
+  fetchReply: true,
+  ephemeral: true,
+  required: true,
+  inline: true,
+  disabled: true,
+  __rootname: process.cwd(),
+  rootTo(...path: string[]) {
+    return join(process.cwd(), ...path);
+  },
 });
